@@ -19,16 +19,15 @@ class Chat implements MessageComponentInterface {
     public function onOpen(ConnectionInterface $conn) {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
-        $cryptSessionId = $conn->WebSocket->request->getCookies()['laravel_session'];
-        $cryptSessionId = substr($cryptSessionId, 0, -3);
+/*        $cryptSessionId = $conn->WebSocket->request->getCookies()['laravel_session'];
         $sessionId = $this->crypt->decrypt($cryptSessionId);
-        $session = \unserialize($this->cache->get('laravel:'.$sessionId));
+        $session = \unserialize($this->cache->get('laravel:'.$sessionId));*/
 
-        $conn->send('Hello ' . $session['name']);
+        $conn->send('Hello ');
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
-        $numRecv = count($this->clients) - 1;
+/*        $numRecv = count($this->clients) - 1;
         echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
             , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
 
@@ -37,7 +36,7 @@ class Chat implements MessageComponentInterface {
                 // The sender is not the receiver, send to each client connected
                 $client->send($msg);
             }
-        }
+        }*/
     }
 
     public function onClose(ConnectionInterface $conn) {
@@ -51,5 +50,11 @@ class Chat implements MessageComponentInterface {
         echo "An error has occurred: {$e->getMessage()}\n";
 
         $conn->close();
+    }
+
+    public function sendMsgToQueue($msg) {
+        foreach ($this->clients as $client) {
+            $client->send($msg);
+        }
     }
 }

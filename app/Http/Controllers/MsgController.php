@@ -1,6 +1,9 @@
 <?php namespace App\Http\Controllers;
+use Input;
+use ZMQContext;
+use ZMQ;
 
-class HomeController extends Controller {
+class MsgController extends Controller {
 
 	/*
 	|--------------------------------------------------------------------------
@@ -14,22 +17,23 @@ class HomeController extends Controller {
 	*/
 
 	/**
-	 * Create a new controller instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		$this->middleware('auth');
-	}
-
-	/**
 	 * Show the application dashboard to the user.
 	 *
 	 * @return Response
 	 */
 	public function index()
 	{
-		return view('home');
+		return view('msg');
 	}
+
+    public function send()
+    {
+        $msg = Input::get('msg');
+        // Push to ZMQ
+        $context = new ZMQContext();
+        $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+        $socket->connect("tcp://localhost:5555");
+
+        $socket->send($msg);
+    }
 }
